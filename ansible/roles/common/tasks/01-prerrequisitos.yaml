@@ -1,0 +1,55 @@
+---
+- name: Se actualizan todas las VM asociadas al laboratorio
+  dnf:
+    name: "*"
+    state: latest
+  become: yes
+
+- name: Se configura el timezone a America/Bogota
+  timezone:
+    name: America/Bogota
+  become: yes
+
+- name: Se instala Chrony
+  dnf:
+    name: chrony
+    state: present
+  become: yes
+
+- name: Se habilita el servicio Chronyd
+  systemd:
+    name: chronyd
+    state: started
+    enabled: yes
+    masked: no
+  become: yes
+
+- name: Se desabilita SELinux
+  selinux:
+    state: disabled
+  become: yes
+
+- name: Se instalan los paquetes requeridos
+  dnf:
+    name: "{{ common_packages }}"
+    state: present
+  become: yes
+
+- name: Se define el hostname para cada máquina
+  hostname:
+    name: "{{inventory_hostname}}.{{domain_vm}}"
+    use: systemd
+  when: inventory_hostname is defined
+  become: yes
+
+- name: Agregamos los DNS de los demás hosts
+  lineinfile:
+    dest: /etc/hosts
+    regexp: '.*{{ item }}$'
+    line: "{{ hostvars[item].ansible_host }} {{item}} {{item}}.{{domain_vm}}"
+    state: present
+  when: hostvars[item].ansible_host is defined
+  with_items: "{{ groups.all }}"
+  become: yes
+
+             

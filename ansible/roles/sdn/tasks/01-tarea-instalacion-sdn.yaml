@@ -1,0 +1,23 @@
+---
+
+- name: Se habilita puerto 8285 para SDN
+  firewalld:
+    port: 8285/tcp
+    permanent: true
+    state: enabled
+  become: yes
+
+- name: Se habilita puerto 8472 para SDN
+  firewalld:
+    port: 8472/tcp
+    permanent: true
+    state: enabled
+  become: yes
+
+- name: Se descarga el fichero para flannel
+  shell: kubectl apply -f https://docs.projectcalico.org/manifests/canal.yaml
+  register: kubectl_sdn
+  when: hostvars[item].ansible_host is defined
+  with_items: "{{ groups.master }}"
+  become: yes
+  

@@ -1,0 +1,65 @@
+---
+- name: Instalación de paquetes de NFS
+  dnf:
+    name: "{{ nfs_packages }}"
+    state: present
+  become: yes
+
+- name: Se arranca servicio de NFS
+  systemd:
+    name: nfs-server
+    state: started
+    enabled: yes
+    masked: no
+  become: yes
+
+- name: Se crea y comparte el directorio para exportar por NFS
+  file:
+    path: /srv/nfs
+    state: directory
+  become: yes
+
+- name: Se configura el acceso al nodo master al share de NFS 
+  lineinfile:
+    dest: /etc/exports
+    line: "/srv/nfs/ {{ hostvars[item].ansible_host }}(rw,sync)"
+    state: present
+  when: hostvars[item].ansible_host is defined
+  with_items: "{{ groups.master }}"
+  become: yes
+
+- name: Se configura el acceso al nodo worker(s) al share de NFS
+  lineinfile:
+    dest: /etc/exports
+    line: "/srv/nfs/ {{ hostvars[item].ansible_host }}(rw,sync)"
+    state: present
+  when: hostvars[item].ansible_host is defined
+  with_items: "{{ groups.workers }}"
+  become: yes
+
+- name: Se abren puertos de firewall para servicio nfs
+  firewalld:
+    service: nfs
+    permanent: true
+    state: enabled
+  become: yes
+
+- name: Se abren puertos de firewall para servicio rpc-bind
+  firewalld:
+    service: rpc-bind
+    permanent: true
+    state: enabled
+  become: yes
+
+- name: Se abren puertos de firewall para servicio mountd
+  firewalld:
+    service: mountd
+    permanent: true
+    state: enabled
+  become: yes
+
+- name: Reinicio de firewall para aplicar cambios 
+  systemd:
+    name: firewalld
+    state: restarted
+  become: yes

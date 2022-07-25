@@ -1,0 +1,82 @@
+---
+
+- name: Se configura puerto 6443 en firewall para acceso a los servicios de kubernetes
+  firewalld:
+    port: 6443/tcp
+    permanent: true
+    state: enabled
+  become: yes
+
+- name: Se configura rango de puertos 2379-2380 en firewall para acceso a los servicios de kubernetes
+  firewalld:
+    port: 2379-2380/tcp
+    permanent: true
+    state: enabled
+  become: yes
+
+- name: Se configura rango de puertos 10250-10252 en firewall para acceso a los servicios de kubernetes
+  firewalld:
+    port: 10250-10252/tcp
+    permanent: true
+    state: enabled
+  become: yes
+
+- name: Se configura puerto 10255 en firewall para acceso a los servicios de kubernetes
+  firewalld:
+    port: 10255/tcp
+    permanent: true
+    state: enabled
+  become: yes
+
+- name: Se reincia el servicio firewall para aplicar cambios 
+  systemd:
+    name: firewalld
+    state: restarted
+  become: yes
+
+- name: Se configura kubeadm
+  shell: kubeadm config images pull
+  become: yes
+  
+- name: Se adiciona regla para permitir el acceso desde los workers
+  firewalld:
+    rich_rule: "rule family=ipv4 source address={{ worker_network }} accept"
+    permanent: true
+    zone: public
+    state: enabled
+  become: yes
+
+- name: Se reincia el servicio firewall para aplicar cambios 
+  systemd:
+    name: firewalld
+    state: restarted
+  become: yes
+
+- name: Se instala el plugin CNI (Container Network Interface) de kubernetes y se define la red de los PODs
+  shell: "kubeadm init --pod-network-cidr {{ pod_network }}"
+  register: kubeadd_cmd
+  become: yes
+
+- name: Se almacena la salida del comando anterior para añadir posteriormente workers al cluster
+  debug:
+    msg: "{{ kubeadd_cmd.stdout_lines }}"
+
+- name: Se permite que root pueda utilizar kubectl para operar el cluster
+  shell: |
+         export KUBECONFIG=/etc/kubernetes/admin.conf
+  become: yes
+
+- name: Autorizar al usuario root acceder al cluster - 1. Crear directorio .kube
+  file:
+    path: /root/.kube
+    state: directory
+  become: yes
+
+- name: Autorizar al usuario root acceder al cluster - 2. Copiar admin.conf y dar permisos
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: /root/.kube/config
+    remote_src: yes
+    owner: root
+    group: root
+  become: yes

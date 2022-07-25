@@ -1,0 +1,31 @@
+---
+
+- name: Se habilita puerto 10250 para los workers
+  firewalld:
+    port: 10250/tcp
+    permanent: true
+    state: enabled
+  become: yes
+
+- name: Se habilita el rango de puertos 30000-32767 para los workers
+  firewalld:
+    port: 30000-32767/tcp
+    permanent: true
+    state: enabled
+  become: yes
+
+- name: Reiniciando el servicio Firewalld 
+  systemd:
+    name: firewalld
+    state: restarted
+  become: yes
+
+- name: Copying token to worker nodes
+  copy: src={{ token_file }} dest=join_token
+
+- name: Joining worker nodes with kubernetes master
+  shell: |
+    kubeadm reset -f
+    cat join_token | tail -2 > out.sh
+    sh out.sh
+  become: yes

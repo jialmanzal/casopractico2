@@ -1,0 +1,33 @@
+---
+
+- name: Se despliegua el Ingress Controller
+  shell: kubectl apply -f https://raw.githubusercontent.com/haproxytech/kubernetes-ingress/master/deploy/haproxy-ingress.yaml
+  register: kubectl_nginxic
+  become: yes
+
+- name: Se crea un namespace para el ingress controller
+  shell: kubectl get namespaces
+  register: kubectl_get_namespaces
+  become: yes
+
+- name: Se presenta el resultado del la creación del namesapace
+  debug:
+    msg: "{{ kubectl_get_namespaces }}"
+
+- name: Se obtiene el namesapace para haproxy-controller
+  shell: kubectl get pods --namespace=haproxy-controller
+  register: kubectl_haproxy_controller
+  become: yes
+
+- name: Se presenta el resultado del namesapace kubectl_haproxy-controller
+  debug:
+    msg: "{{ kubectl_haproxy_controller }}"
+
+- name: Se muestran los servicios
+  shell: kubectl get svc -A
+  register: kubectl_get_svc
+  become: yes
+
+- name: Se presenta el resultado de los servicios
+  debug:
+    msg: "{{ kubectl_get_svc }}"

@@ -1,0 +1,7 @@
+- name: Tareas de configuracion para SDN
+  hosts: master:workers
+  vars_files:
+    - "group_vars/master.yaml"
+  gather_facts: true
+  roles:
+    - sdn

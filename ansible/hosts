@@ -1,0 +1,11 @@
+[all:vars]
+ansible_user=azureuser
+
+[master]
+vm-MasterKubernetes ansible_host=20.125.128.134
+
+[workers]
+vm-WorkerKubernetes ansible_host=20.125.131.3
+
+[nfs]
+vm-NFS ansible_host=20.125.130.34

@@ -1,0 +1,45 @@
+---
+
+- name: Firewalld regla 1
+  shell: firewall-cmd --add-port={6443,2379-2380,10250,10251,10252,5473,179,5473}/tcp --permanent
+  become: yes
+
+- name: Firewalld regla 2
+  shell: firewall-cmd --add-port={4789,8285,8472}/udp --permanent
+  become: yes
+
+- name: Reinicio  de firewall para aplicar cambios
+  shell: firewall-cmd --reload
+  become: yes
+
+- name: Se habilita servicio kubelet 
+  shell: systemctl enable kubelet
+  become: yes
+
+- name: Pull de  imagenes
+  shell: kubeadm config images pull
+  become: yes
+
+- name: Creación del cluster
+  shell: kubeadm init --pod-network-cidr {{ pod_network }}
+  register: kubeadd_cmd
+  become: yes
+
+- name: Se almacena la salida del comando anterior para añadir posteriormente workers al cluster.
+  local_action: copy content={{ kubeadd_cmd.stdout }} dest={{ token_file }}
+  become: False
+
+- name: Autorizar al usuario root acceder al cluster - 1. Crear directorio .kube
+  file:
+    path: /root/.kube
+    state: directory
+  become: yes
+
+- name: Autorizar al usuario root acceder al cluster - 2. Copiar admin.conf y dar permisos
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: /root/.kube/config
+    remote_src: yes
+    owner: root
+    group: root
+  become: yes

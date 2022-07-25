@@ -1,0 +1,10 @@
+---
+
+# Ejecutamos las configuraciones comunes a todos los nodos
+- import_playbook: 01-tareas-previas.yaml
+- import_playbook: 02-instalacion-nfs.yaml
+- import_playbook: 03-tareas-comunes-master-worker.yaml
+- import_playbook: 04-configuracion-master.yaml
+- import_playbook: 05-instalacion-sdn.yaml
+- import_playbook: 06-despliegue-ingress-controller.yaml
+- import_playbook: 07-configuracion-worker.yaml

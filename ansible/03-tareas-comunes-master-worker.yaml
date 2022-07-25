@@ -1,0 +1,9 @@
+---
+
+- name: Tareas comunes a realizar en el nodo master y los workers
+  hosts: master:workers
+  vars_files:
+    - "group_vars/master_worker.yaml"
+  gather_facts: true
+  roles:
+    - master_worker

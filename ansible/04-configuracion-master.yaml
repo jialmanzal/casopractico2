@@ -1,0 +1,7 @@
+- name: Tareas de configuracion del nodo master
+  hosts: master
+  vars_files:
+    - "group_vars/master.yaml"
+  gather_facts: true
+  roles:
+    - master

@@ -1,0 +1,4 @@
+---
+common_packages: ['nfs-utils','nfs4-acl-tools','wget']
+
+domain_vm: 'acme.com'

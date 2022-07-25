@@ -1,0 +1,5 @@
+worker_network: "10.0.0.0/16"
+
+pod_network: "192.169.0.0/16"
+
+token_file: join_token

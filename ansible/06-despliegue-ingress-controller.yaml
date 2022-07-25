@@ -1,0 +1,7 @@
+- name: Tareas de despliegue para ingress controller
+  hosts: master
+  vars_files:
+    - "group_vars/master.yaml"
+  gather_facts: true
+  roles:
+    - ingress-controller

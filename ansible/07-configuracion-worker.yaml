@@ -1,0 +1,7 @@
+- name: Tareas de configuracion de workers
+  hosts: worker
+  vars_files:
+    - "group_vars/master.yaml"
+  gather_facts: true
+  roles:
+    - worker

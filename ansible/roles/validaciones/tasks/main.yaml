@@ -1,0 +1,77 @@
+- name: Validación 1
+  shell: kubectl get nodes -o wide
+  register: kubectl_getnodes
+  become: yes
+
+
+- name: Resultado del comando kubectl get nodes -o wide 
+  debug:
+    msg: "{{ kubectl_getnodes.stdout_lines }}"
+
+
+- name: Validación 2
+  shell: kubectl get pods -A -o wide
+  register: kubectl_getpods
+  become: yes
+
+
+- name: Resultado del comando kubectl get pods -A -o wide
+  debug:
+    msg: "{{ kubectl_getpods.stdout_lines }}"
+
+
+- name: Validación 3
+  shell: kubectl get namespaces
+  register: kubectl_getnamespaces
+  become: yes
+
+
+- name: Resultado del comando kubectl get namespaces
+  debug:
+    msg: "{{ kubectl_getnamespaces.stdout_lines }}"
+
+
+
+- name: Validación 4
+  shell: kubectl get svc -A -o wide
+  register: kubectl_getsvc
+  become: yes
+
+
+- name: Resultado del comando kubectl get svc -A -o wide
+  debug:
+    msg: "{{ kubectl_getsvc.stdout_lines }}"
+
+
+- name: Validación 5
+  shell: kubectl get ingress -A
+  register: kubectl_getingress
+  become: yes
+
+
+- name: Resultado del comando kubectl get ingress -A
+  debug:
+    msg: "{{ kubectl_getingress.stdout_lines }}"
+
+
+
+- name: Validación 6
+  shell: kubectl get pv -A
+  register: kubectl_getpv
+  become: yes
+
+
+- name: Resultado del comando kubectl get pv -A
+  debug:
+    msg: "{{ kubectl_getpv.stdout_lines }}"
+
+
+- name: Validación 7
+  shell: kubectl get pvc -A
+  register: kubectl_getpvc
+  become: yes
+
+
+- name: Resultado del comando kubectl get pvc -A
+  debug:
+    msg: "{{ kubectl_getpvc.stdout_lines }}"
